@@ -1,71 +1,107 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalender Kegiatan GA - Bank Mandiri Area Mataram</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body{font-family:Inter,Arial,sans-serif;background:#eef3fb}
-.calendar-day{min-height:110px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalender GA - Bank Mandiri Area Mataram</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{font-family:'Poppins',sans-serif}
+    body{background:#eef4fb}
+    .day{min-height:120px}
+    .today{outline:3px solid #F59E0B}
+  </style>
 </head>
-<body>
 
-<div class="max-w-7xl mx-auto p-5">
+<body class="p-5">
 
-  <div class="bg-gradient-to-r from-blue-900 via-blue-700 to-yellow-500 rounded-3xl p-8 text-white shadow-xl mb-6">
-    <p class="text-sm opacity-80">BANK MANDIRI AREA MATARAM</p>
-    <h1 class="text-4xl font-bold mt-2">📅 Kalender Kegiatan GA</h1>
-    <p class="mt-2 opacity-90">Terhubung langsung ke Google Sheets.</p>
+<div class="max-w-7xl mx-auto">
+
+  <!-- HEADER -->
+  <div class="rounded-[28px] p-8 text-white shadow-xl mb-6 bg-gradient-to-r from-[#003D79] via-[#005EB8] to-[#FDB913]">
+      <p class="uppercase text-sm opacity-80 tracking-widest">Bank Mandiri Area Mataram</p>
+
+      <h1 class="text-4xl font-bold mt-2 flex items-center gap-3">
+        📅 Kalender Kegiatan GA
+      </h1>
+
+      <p class="mt-2 opacity-90">
+        Semua agenda otomatis diambil dari Google Sheets.
+      </p>
   </div>
 
+  <!-- COUNTDOWN -->
   <div class="grid md:grid-cols-3 gap-5 mb-6">
 
-    <div class="bg-white rounded-2xl p-5 shadow">
-      <p class="text-sm text-gray-500">Acara Terdekat</p>
-      <h2 id="nextTitle" class="text-xl font-bold text-blue-800 mt-2">Memuat...</h2>
-      <p id="nextInfo" class="text-gray-500 text-sm"></p>
+    <div class="bg-white rounded-3xl p-5 shadow">
+      <p class="text-gray-500 text-sm">Acara Terdekat</p>
+
+      <h2 id="nextTitle" class="text-xl font-bold text-[#005EB8] mt-2">
+        Memuat...
+      </h2>
+
+      <p id="nextInfo" class="text-sm text-gray-500 mt-1"></p>
     </div>
 
-    <div class="bg-white rounded-2xl p-5 shadow md:col-span-2">
-      <p class="text-sm text-gray-500">Countdown</p>
-      <div id="countdown" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"></div>
+    <div class="bg-white rounded-3xl p-5 shadow md:col-span-2">
+      <p class="text-gray-500 text-sm">Countdown Menuju Acara</p>
+
+      <div id="countdown" class="grid grid-cols-4 gap-3 mt-4"></div>
     </div>
 
   </div>
 
+  <!-- CONTENT -->
   <div class="grid lg:grid-cols-[1fr,340px] gap-6">
 
-    <div class="bg-white rounded-3xl p-5 shadow">
+    <!-- CALENDAR -->
+    <div class="bg-white rounded-3xl shadow p-5">
 
-      <div class="flex justify-between items-center mb-4">
-        <button onclick="changeMonth(-1)" class="border rounded-lg px-3 py-2 hover:bg-slate-100">◀</button>
-        <h2 id="monthTitle" class="font-bold text-xl text-blue-800"></h2>
-        <button onclick="changeMonth(1)" class="border rounded-lg px-3 py-2 hover:bg-slate-100">▶</button>
+      <div class="flex justify-between items-center mb-5">
+
+        <button onclick="changeMonth(-1)"
+          class="rounded-xl border px-3 py-2 hover:bg-gray-100">
+          ◀
+        </button>
+
+        <h2 id="monthTitle" class="text-xl font-bold text-[#003D79]"></h2>
+
+        <button onclick="changeMonth(1)"
+          class="rounded-xl border px-3 py-2 hover:bg-gray-100">
+          ▶
+        </button>
+
       </div>
 
-      <div class="grid grid-cols-7 text-center font-semibold text-xs text-gray-500 mb-2">
-        <div>MIN</div>
-        <div>SEN</div>
-        <div>SEL</div>
-        <div>RAB</div>
-        <div>KAM</div>
-        <div>JUM</div>
-        <div>SAB</div>
+      <div class="grid grid-cols-7 text-center text-xs font-semibold text-gray-500 mb-2">
+        <div>MIN</div><div>SEN</div><div>SEL</div>
+        <div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div>
       </div>
 
       <div id="calendar" class="grid grid-cols-7 gap-2"></div>
 
     </div>
 
-    <div class="bg-white rounded-3xl p-5 shadow">
+    <!-- LIST -->
+    <div class="bg-white rounded-3xl shadow p-5">
+
       <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-blue-800">Agenda GA</h3>
-        <button onclick="loadEvents()" class="text-sm bg-blue-700 text-white px-3 py-1 rounded-lg hover:bg-blue-800">Refresh</button>
+        <h2 class="font-bold text-[#003D79] text-lg">Agenda GA</h2>
+
+        <button onclick="loadEvents()"
+        class="bg-[#005EB8] text-white text-sm px-3 py-2 rounded-lg hover:bg-blue-900">
+          Refresh
+        </button>
       </div>
 
       <div id="agendaList" class="space-y-3 text-sm"></div>
+
     </div>
 
   </div>
@@ -74,90 +110,52 @@ body{font-family:Inter,Arial,sans-serif;background:#eef3fb}
 
 <script>
 
-const SHEET_ID="2PACX-1vQdvQN9ZBxdy9ter_b0Qr_gGMwAety_w9u1ojbqxZuddB3w5EIzME3jlO9xvfoSdWcv1DmL--rvwWRh";
+const SHEET_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vQdvQN9ZBxdy9ter_b0Qr_gGMwAety_w9u1ojbqxZuddB3w5EIzME3jlO9xvfoSdWcv1DmL--rvwWRh/gviz/tq?tqx=out:json";
 
-const SHEET_NAME="Agenda GA";
+const monthNames=[
+"Januari","Februari","Maret","April","Mei","Juni",
+"Juli","Agustus","September","Oktober","November","Desember"
+];
 
-const sheetURL=`https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?gid=483038837&single=true&output=csv&t=${Date.now()}`;
+const colorCategory={
+"Donor Darah":"bg-red-100 text-red-700",
+"CSR":"bg-green-100 text-green-700",
+"Rapat":"bg-blue-100 text-blue-700",
+"Monitoring":"bg-purple-100 text-purple-700",
+"BAST":"bg-cyan-100 text-cyan-700",
+"Sembako":"bg-yellow-100 text-yellow-700"
+};
 
 let events=[];
 let current=new Date();
-
-const monthNames=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
-const categoryColor={
-  "Donor Darah":"bg-red-100 text-red-700",
-  "CSR":"bg-green-100 text-green-700",
-  "Rapat":"bg-blue-100 text-blue-700",
-  "Monitoring":"bg-purple-100 text-purple-700",
-  "Sembako":"bg-yellow-100 text-yellow-700",
-  "BAST":"bg-cyan-100 text-cyan-700",
-  "Kunjungan":"bg-orange-100 text-orange-700",
-  "Lainnya":"bg-gray-100 text-gray-700"
-};
-
-function parseCSV(text){
-
-  const rows=[];
-  let row=[];
-  let current="";
-  let insideQuote=false;
-
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-
-    if(c==='"'){
-      insideQuote=!insideQuote;
-      continue;
-    }
-
-    if(c===',' && !insideQuote){
-      row.push(current);
-      current="";
-      continue;
-    }
-
-    if((c==='\n' || c==='\r') && !insideQuote){
-      if(current!=="" || row.length){
-        row.push(current);
-        rows.push(row);
-      }
-      row=[];
-      current="";
-      continue;
-    }
-
-    current+=c;
-  }
-
-  if(current!=="" || row.length){
-    row.push(current);
-    rows.push(row);
-  }
-
-  return rows;
-}
 
 async function loadEvents(){
 
   document.getElementById("agendaList").innerHTML="Memuat agenda...";
 
-  try{{
+  try{
 
-    const csv=await fetch(sheetURL,{cache:"no-store"}).then(r=>r.text());
+    const text=await fetch(SHEET_URL+"&t="+Date.now()).then(r=>r.text());
 
-    const rows=parseCSV(csv);
+    const json=JSON.parse(text.substring(47,text.length-2));
 
-    rows.shift();
+    events=json.table.rows.map(r=>{
 
-    events=rows.map(r=>({
-      date:r[0]||"",
-      title:r[1]||"",
-      pic:r[2]||"",
-      location:r[3]||"",
-      category:r[4]||"Lainnya",
-      note:r[5]||""
-    })).filter(e=>e.title!="");
+      const c=r.c;
+
+      return{
+
+        date:c[0]?.f || c[0]?.v || "",
+        title:c[1]?.v || "",
+        pic:c[2]?.v || "",
+        location:c[3]?.v || "",
+        category:c[4]?.v || "Lainnya",
+        note:c[5]?.v || ""
+
+      }
+
+    }).filter(e=>e.title);
 
     events.sort((a,b)=>new Date(a.date)-new Date(b.date));
 
@@ -167,77 +165,108 @@ async function loadEvents(){
 
   }catch(err){
 
-    document.getElementById("agendaList").innerHTML=`
-      <div class='bg-red-100 text-red-700 p-3 rounded-xl'>
-      ❌ Tidak bisa membaca Google Sheet.<br><br>
-      Pastikan Google Sheet sudah <b>Publish to Web (CSV)</b>.
-      </div>`;
+    console.log(err);
 
-    console.error(err);
+    document.getElementById("agendaList").innerHTML=
+    "<div class='bg-red-100 text-red-700 p-4 rounded-xl'>❌ Tidak bisa membaca Google Sheets.<br>Pastikan sheet sudah di-<b>Publish to Web</b>.</div>";
+
   }
+
 }
 
 function renderAgenda(){
 
-  const list=document.getElementById("agendaList");
-  list.innerHTML="";
+  const box=document.getElementById("agendaList");
+
+  box.innerHTML="";
 
   events.forEach(e=>{
 
-    list.innerHTML+=`
-    <div class='border-l-4 border-blue-700 bg-slate-50 rounded-xl p-3'>
-      <div class='font-bold text-blue-800'>${e.title}</div>
+    box.innerHTML+=`
+    <div class="rounded-xl border-l-4 border-[#005EB8] bg-slate-50 p-3">
 
-      <div class='text-xs mt-2'>📅 ${new Date(e.date).toLocaleString('id-ID')}</div>
-      <div class='text-xs'>👤 PIC : ${e.pic}</div>
-      <div class='text-xs'>📍 ${e.location}</div>
+      <div class="font-semibold text-[#003D79]">${e.title}</div>
 
-      <span class='inline-block mt-2 px-2 py-1 rounded-full text-xs ${categoryColor[e.category]||categoryColor.Lainnya}'>
+      <div class="text-xs mt-2">📅 ${new Date(e.date).toLocaleString("id-ID")}</div>
+
+      <div class="text-xs">👤 PIC : ${e.pic}</div>
+
+      <div class="text-xs">📍 ${e.location}</div>
+
+      <span class="inline-block mt-2 px-2 py-1 rounded-full text-xs
+      ${colorCategory[e.category] || "bg-gray-100 text-gray-700"}">
+
         ${e.category}
-      </span>
-    </div>`;
 
+      </span>
+
+    </div>`;
   });
+
 }
 
 function renderCalendar(){
 
-  const calendar=document.getElementById("calendar");
-  calendar.innerHTML="";
+  const grid=document.getElementById("calendar");
+  grid.innerHTML="";
 
   const year=current.getFullYear();
   const month=current.getMonth();
 
-  document.getElementById("monthTitle").innerText=`${monthNames[month]} ${year}`;
+  document.getElementById("monthTitle").innerHTML=
+  monthNames[month]+" "+year;
 
   const firstDay=new Date(year,month,1).getDay();
   const totalDays=new Date(year,month+1,0).getDate();
 
-  for(let i=0;i<firstDay;i++) calendar.innerHTML+="<div></div>";
+  for(let i=0;i<firstDay;i++)
+    grid.innerHTML+="<div></div>";
 
-  for(let d=1;d<=totalDays;d++){
+  for(let day=1;day<=totalDays;day++){
 
-    const key=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const dateKey=
+    year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
 
-    const todayEvents=events.filter(e=>e.date.startsWith(key));
+    const todayEvents=events.filter(e=>e.date.startsWith(dateKey));
 
-    let html=`
-    <div class='calendar-day rounded-xl border bg-white p-2'>
-      <div class='font-bold text-sm'>${d}</div>`;
+    const today=new Date();
+
+    const isToday=
+      today.getDate()==day &&
+      today.getMonth()==month &&
+      today.getFullYear()==year;
+
+    let html=
+    `<div class="day rounded-xl border bg-white p-2 ${isToday?'today':''}">
+
+      <div class="font-bold text-sm">${day}</div>`;
 
     todayEvents.forEach(ev=>{
-      html+=`<div class='mt-1 rounded px-1 text-[10px] ${categoryColor[ev.category]||categoryColor.Lainnya}'>${ev.title}</div>`;
+
+      html+=`
+      <div class="mt-1 rounded px-1 py-[2px] text-[10px]
+      ${colorCategory[ev.category]||"bg-gray-100"}">
+
+      ${ev.title}
+
+      </div>`;
+
     });
 
     html+="</div>";
 
-    calendar.innerHTML+=html;
+    grid.innerHTML+=html;
+
   }
+
 }
 
 function changeMonth(step){
+
   current.setMonth(current.getMonth()+step);
+
   renderCalendar();
+
 }
 
 function renderCountdown(){
@@ -245,12 +274,14 @@ function renderCountdown(){
   const next=events.find(e=>new Date(e.date)>new Date());
 
   if(!next){
-    document.getElementById("nextTitle").innerText="Tidak ada agenda mendatang";
+    document.getElementById("nextTitle").innerHTML="Tidak ada agenda.";
     return;
   }
 
-  document.getElementById("nextTitle").innerText=next.title;
-  document.getElementById("nextInfo").innerText=`${new Date(next.date).toLocaleString("id-ID")} • ${next.location}`;
+  document.getElementById("nextTitle").innerHTML=next.title;
+
+  document.getElementById("nextInfo").innerHTML=
+  new Date(next.date).toLocaleString("id-ID")+" • "+next.location;
 
   function tick(){
 
@@ -266,15 +297,18 @@ function renderCountdown(){
     const labels=["Hari","Jam","Menit","Detik"];
 
     document.getElementById("countdown").innerHTML=
-      values.map((v,i)=>`
-        <div class='bg-blue-50 rounded-xl text-center p-3'>
-          <div class='text-3xl font-bold text-blue-700'>${v}</div>
-          <div class='text-xs text-gray-500'>${labels[i]}</div>
-        </div>`).join("");
+    values.map((v,i)=>`
+      <div class="bg-blue-50 rounded-xl p-3 text-center">
+        <div class="text-3xl font-bold text-[#005EB8]">${v}</div>
+        <div class="text-xs text-gray-500">${labels[i]}</div>
+      </div>
+    `).join("");
+
   }
 
   tick();
   setInterval(tick,1000);
+
 }
 
 loadEvents();
