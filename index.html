@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalender GA Bank Mandiri Area Mataram</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-5">
+
+<div class="max-w-6xl mx-auto">
+  <div class="bg-gradient-to-r from-blue-900 to-yellow-500 text-white rounded-3xl p-6 mb-6 shadow-xl">
+    <p class="text-sm opacity-80">BANK MANDIRI AREA MATARAM</p>
+    <h1 class="text-3xl font-bold mt-2">📅 Kalender Kegiatan GA</h1>
+    <p class="mt-2 opacity-90">Data otomatis dari Google Sheets.</p>
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 shadow mb-6">
+    <p class="text-gray-500 text-sm">Acara Terdekat</p>
+    <h2 id="nextTitle" class="text-2xl font-bold text-blue-800 mt-2">Memuat...</h2>
+    <p id="nextInfo" class="text-gray-500"></p>
+
+    <div id="countdown" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5"></div>
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 shadow">
+    <h2 class="text-xl font-bold text-blue-800 mb-4">📋 Agenda GA</h2>
+    <div id="agendaList" class="space-y-3">Sedang memuat agenda...</div>
+  </div>
+</div>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQdvQN9ZBxdy9ter_b0Qr_gGMwAety_w9u1ojbqxZuddB3w5EIzME3jlO9xvfoSdWcv1DmL--rvwWRh/pub?gid=483038837&single=true&output=csv";
+let events = [];
+
+async function loadEvents(){
+  const res = await fetch(sheetURL);
+  const csv = await res.text();
+
+  const rows = csv.trim().split("\n").slice(1);
+
+  events = rows.map(row=>{
+      const cols = row.split(",");
+      return {
+        date: cols[0],
+        title: cols[1],
+        pic: cols[2],
+        location: cols[3],
+        category: cols[4],
+        note: cols[5]
+      };
+  }).filter(e=>e.title);
+
+  events.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  renderAgenda();
+  updateCountdown();
+}
+
+function renderAgenda(){
+  const list = document.getElementById("agendaList");
+  list.innerHTML = "";
+
+  events.forEach(e=>{
+    list.innerHTML += `
+      <div class="border-l-4 border-blue-700 bg-slate-50 rounded-xl p-4">
+        <div class="flex justify-between flex-wrap gap-2">
+          <h3 class="font-bold text-blue-800">${e.title}</h3>
+          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">${e.category}</span>
+        </div>
+
+        <p class="text-sm mt-2">📅 ${new Date(e.date).toLocaleString("id-ID")}</p>
+        <p class="text-sm">👤 PIC : ${e.pic}</p>
+        <p class="text-sm">📍 Lokasi : ${e.location}</p>
+        <p class="text-sm text-gray-500">${e.note||""}</p>
+      </div>`;
+  });
+}
+
+function updateCountdown(){
+  const upcoming = events.find(e=>new Date(e.date)>new Date());
+  if(!upcoming) return;
+
+  document.getElementById("nextTitle").textContent = upcoming.title;
+  document.getElementById("nextInfo").textContent =
+    new Date(upcoming.date).toLocaleString("id-ID")+" • "+upcoming.location;
+
+  function tick(){
+    const diff = new Date(upcoming.date)-new Date();
+
+    const day=Math.floor(diff/86400000);
+    const hour=Math.floor(diff%86400000/3600000);
+    const minute=Math.floor(diff%3600000/60000);
+    const second=Math.floor(diff%60000/1000);
+
+    const vals=[day,hour,minute,second];
+    const labels=["Hari","Jam","Menit","Detik"];
+
+    document.getElementById("countdown").innerHTML =
+      vals.map((v,i)=>`
+      <div class="bg-blue-50 rounded-xl p-4 text-center">
+        <div class="text-3xl font-bold text-blue-700">${v}</div>
+        <div class="text-xs text-gray-500">${labels[i]}</div>
+      </div>`).join("");
+  }
+
+  tick();
+  setInterval(tick,1000);
+}
+
+loadEvents();
+</script>
+
+</body>
+</html>
