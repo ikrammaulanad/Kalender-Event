@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalender GA Area Mataram</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#eef3fb}
+.day{min-height:100px}
+</style>
+</head>
+<body class="p-4">
+<div class="max-w-7xl mx-auto">
+<div class="bg-gradient-to-r from-blue-900 to-yellow-500 text-white rounded-3xl p-6 mb-6">
+<h1 class="text-3xl font-bold">📅 Kalender GA Area Mataram</h1>
+<p>Terhubung ke Google Sheets</p>
+</div>
+
+<div class="bg-white rounded-2xl p-5 mb-6 shadow">
+<h2 class="font-bold text-blue-800 mb-2">⏳ Acara Terdekat</h2>
+<div id="nextTitle" class="text-xl font-bold">Memuat...</div>
+<div id="nextInfo" class="text-gray-500"></div>
+<div id="countdown" class="grid grid-cols-4 gap-3 mt-4"></div>
+</div>
+
+<div class="grid lg:grid-cols-[1fr,330px] gap-6">
+<div class="bg-white rounded-3xl p-5 shadow">
+<div class="flex justify-between items-center mb-4">
+<button onclick="changeMonth(-1)" class="border rounded-lg px-3 py-2">◀</button>
+<h2 id="monthTitle" class="font-bold text-xl text-blue-800"></h2>
+<button onclick="changeMonth(1)" class="border rounded-lg px-3 py-2">▶</button>
+</div>
+
+<div class="grid grid-cols-7 text-center text-xs font-bold text-gray-500 mb-2">
+<div>MIN</div><div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div>
+</div>
+
+<div id="calendar" class="grid grid-cols-7 gap-2"></div>
+</div>
+
+<div class="bg-white rounded-3xl p-5 shadow">
+<h2 class="font-bold text-blue-800 mb-4">Agenda</h2>
+<div id="agendaList" class="space-y-3"></div>
+</div>
+</div>
+</div>
+
+<script>
+const url="https://docs.google.com/spreadsheets/d/e/2PACX-1vQdvQN9ZBxdy9ter_b0Qr_gGMwAety_w9u1ojbqxZuddB3w5EIzME3jlO9xvfoSdWcv1DmL--rvwWRh/gviz/tq?tqx=out:json&sheet=Agenda%20GA";
+
+let events=[];
+let current=new Date();
+
+const colors={
+"Donor Darah":"bg-red-100 text-red-700",
+"CSR":"bg-green-100 text-green-700",
+"Rapat":"bg-blue-100 text-blue-700",
+"Monitoring":"bg-purple-100 text-purple-700",
+"Sembako":"bg-yellow-100 text-yellow-700",
+"BAST":"bg-cyan-100 text-cyan-700"
+};
+
+const monthNames=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+async function loadData(){
+ const txt=await fetch(url+"?v="+Date.now()).then(r=>r.text());
+ const json=JSON.parse(txt.substring(47,txt.length-2));
+ const rows=json.table.rows;
+
+ events=rows.map(r=>({
+   date:r.c[0]?.f || r.c[0]?.v,
+   title:r.c[1]?.v||"",
+   pic:r.c[2]?.v||"",
+   location:r.c[3]?.v||"",
+   category:r.c[4]?.v||"Lainnya",
+   note:r.c[5]?.v||""
+ })).filter(e=>e.title);
+
+ events.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+ renderCalendar();
+ renderAgenda();
+ updateCountdown();
+}
+
+function renderAgenda(){
+ const list=document.getElementById("agendaList");
+ list.innerHTML="";
+ events.forEach(e=>{
+   list.innerHTML+=`
+   <div class="border-l-4 border-blue-700 bg-slate-50 rounded-xl p-3">
+      <div class="font-bold text-blue-800">${e.title}</div>
+      <div class="text-xs mt-1">📅 ${new Date(e.date).toLocaleString("id-ID")}</div>
+      <div class="text-xs">👤 ${e.pic}</div>
+      <div class="text-xs">📍 ${e.location}</div>
+      <div class="inline-block mt-2 rounded-full px-2 py-1 text-xs ${colors[e.category]||"bg-gray-100 text-gray-700"}">${e.category}</div>
+   </div>`;
+ });
+}
+
+function renderCalendar(){
+ const grid=document.getElementById("calendar");
+ grid.innerHTML="";
+ const y=current.getFullYear();
+ const m=current.getMonth();
+ document.getElementById("monthTitle").textContent=monthNames[m]+" "+y;
+ const first=new Date(y,m,1).getDay();
+ const total=new Date(y,m+1,0).getDate();
+ for(let i=0;i<first;i++)grid.innerHTML+="<div></div>";
+ for(let d=1;d<=total;d++){
+
+   const key=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+   const dayEvents=events.filter(e=>e.date.startsWith(key));
+
+   let html=`<div class="day rounded-xl border p-2 bg-white">
+     <div class="font-bold text-sm">${d}</div>`;
+
+   dayEvents.forEach(ev=>{
+      html+=`<div class="mt-1 rounded px-1 text-[10px] ${colors[ev.category]||"bg-gray-100 text-gray-700"}">${ev.title}</div>`;
+   });
+
+   html+="</div>";
+   grid.innerHTML+=html;
+ }
+}
+
+function changeMonth(step){
+ current.setMonth(current.getMonth()+step);
+ renderCalendar();
+}
+
+function updateCountdown(){
+ const next=events.find(e=>new Date(e.date)>new Date());
+ if(!next) return;
+ document.getElementById("nextTitle").textContent=next.title;
+ document.getElementById("nextInfo").textContent=new Date(next.date).toLocaleString("id-ID")+" • "+next.location;
+
+ function tick(){
+   const diff=new Date(next.date)-new Date();
+   const vals=[
+    Math.floor(diff/86400000),
+    Math.floor(diff%86400000/3600000),
+    Math.floor(diff%3600000/60000),
+    Math.floor(diff%60000/1000)
+   ];
+   const labels=["Hari","Jam","Menit","Detik"];
+   document.getElementById("countdown").innerHTML=
+     vals.map((v,i)=>`
+      <div class="bg-blue-50 rounded-xl p-3 text-center">
+        <div class="text-2xl font-bold text-blue-700">${v}</div>
+        <div class="text-xs">${labels[i]}</div>
+      </div>`).join("");
+ }
+ tick();
+ setInterval(tick,1000);
+}
+
+loadData();
+</script>
+</body>
+</html>
